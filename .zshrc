@@ -1,6 +1,7 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
+source /usr/local/bin/virtualenvwrapper.sh
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -24,7 +25,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
 # Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+CASE_SENSITIVE="true"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
@@ -75,7 +76,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git ssh-agent zsh-nvm kubectl kube-ps1)
+plugins=(git ssh-agent zsh-nvm kubectl kube-ps1 aws poetry)
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 source $ZSH/oh-my-zsh.sh
 
@@ -104,22 +105,26 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source /usr/local/bin/virtualenvwrapper.sh
 
 alias dsp='docker system prune'
 alias di='docker images'
 alias dps='docker ps -a'
-alias dcs='docker-compose -f jgdc.yml stop'
-alias dcu='docker-compose -f jgdc.yml up'
-alias dcud='docker-compose -f jgdc.yml up -d'
-alias gcdy='git checkout develop'
+alias dcs='docker-compose stop'
+alias dcu='docker-compose up'
+alias dcud='docker-compose up -d'
+alias gcd='git checkout develop'
+alias k=`kubectl $@`
+
+kswn() {
+    kubectl config set-context --current --namespace="$@"
+}
 
 dcr() {
-  docker-compose -f jgdc.yml --rm run "$@"
+  docker-compose --rm run "$@"
 }
 
 dc(){
-  docker-compose -f jgdc.yml "$@"
+  docker-compose "$@"
 }
 
 dcclean() {
@@ -134,6 +139,10 @@ gcv() {
     git commit -v
 }
 
+merge-dev() {
+    git merge --no-ff --no-commit develop
+}
+
 nbook() {
     jupyter-lab
 }
@@ -144,29 +153,17 @@ new-branch() {
     git checkout -b "$@"
 }
 
-run_tests() {
-    ./manage.py test --parallel
-}
-
-pyt() {
-    pytest -c mytest.ini "$@"
-}
-
 rs() {
     ./manage.py runserver
 }
 
-staging_mmh() {
-    ssh 174.129.122.129
-}
-
-prod_mmh() {
-    ssh 3.209.35.94
-}
-
-dcmaint() {
-    dc run db_maint bash
-}
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export PATH=/home/jgibson/.local/bin/aws_completer:$PATH
+export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$HOME/dev_libraries/flutter/bin:$PATH"
+autoload bashcompinit && bashcompinit
+complete -C '/home/jgibson/.local/bin/aws_completer' aws
+
+eval "$(direnv hook zsh)"
