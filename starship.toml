@@ -3,20 +3,20 @@ add_newline = true
 scan_timeout = 10
 
 format = """
-[┌───────────────────>](bold green)$battery
-[│](bold green)$directory$package
-[│](bold green)$git_branch$git_status$git_commit$git_state
-[│](bold green)$kubernetes
+[┌>](bold green)$kubernetes$aws
 [│](bold green)$python$nodejs
+[│](bold green)$git_branch$git_status$git_commit$git_state $directory$package
 [└─>](bold green) """
 
 [kubernetes]
 format = '[$symbol$context( \($namespace\))](bold yellow)'
 disabled = false
 
+[aws]
+format = " | [($version$profile)](blue)"
+
+
 [battery]
-full_symbol = "🔋"
-charging_symbol = "🔌"
 discharging_symbol = "⚡"
 
 [[battery.display]]
@@ -36,8 +36,7 @@ truncate_to_repo = false
 format = "[$path]($style)[$lock_symbol]($lock_style) "
 
 [git_branch]
-format = " [$symbol$branch]($style) "
-symbol = "🍣 "
+format = "[$symbol$branch]($style) "
 style = "bold yellow"
 
 [git_commit]
@@ -47,20 +46,6 @@ only_detached = false
 
 [git_state]
 progress_divider = " of "
-
-[git_status]
-conflicted = "⚔️ "
-ahead = "🏎️ 💨 ×${count}"
-behind = "🐢 ×${count}"
-diverged = "🔱 🏎️ 💨 ×${ahead_count} 🐢 ×${behind_count}"
-untracked = "🛤️  ×${count}"
-stashed = "📦 "
-modified = "📝 ×${count}"
-staged = "🗃️  ×${count}"
-renamed = "📛 ×${count}"
-deleted = "🗑️  ×${count}"
-style = "bright-white"
-format = "$all_status$ahead_behind"
 
 [hostname]
 ssh_only = false
@@ -80,13 +65,17 @@ disabled = false
 [package]
 disabled = true
 
+[nodejs]
+format="[$symbol($version )](bold blue)"
+
 [python]
-format = "[$symbol$version]($style) "
+symbol = ""
+format = "[$symbol $version]($style) | "
 style = "bold green"
 
 [time]
 time_format = "%T"
-format = "🕙 $time($style) "
+format = "$time($style) "
 style = "bright-white"
 disabled = false
 
@@ -95,6 +84,4 @@ style_user = "bold dimmed blue"
 show_always = false
 
 [gcloud]
-symbol = "🇬️ "
 format = 'on [$symbol$account(\($project\))]($style) '
-
